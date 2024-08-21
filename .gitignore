@@ -1,6 +1,11 @@
 node_modules
 dist
 .env
+.next
 
 # prod
 .DS_Store
+
+# dev
+file_structure_and_contents.txt
+create_txt.py
