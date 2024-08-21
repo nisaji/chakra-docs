@@ -1,6 +1,6 @@
 {
   "name": "chakra-docs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A React component library for creating docs with structured content. This library is powered by Chakra UI",
   "author": "nisaji",
   "license": "MIT",
