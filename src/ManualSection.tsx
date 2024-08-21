@@ -2,6 +2,11 @@ import React from "react";
 import {
   Box,
   Heading,
+  Text,
+  Image,
+  UnorderedList,
+  OrderedList,
+  ListItem,
   Accordion,
   AccordionItem,
   AccordionButton,
@@ -9,13 +14,41 @@ import {
   AccordionIcon,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { IManualSection } from "./types";
-import theme from "./styles/theme";
+import { IManualSection, IManualContent } from "./types";
 
 interface ManualSectionProps {
   section: IManualSection;
   level?: number;
 }
+
+const renderContent = (content: IManualContent) => {
+  switch (content.type) {
+    case "paragraph":
+      return <Text mb={4}>{content.content as string}</Text>;
+    case "image":
+      return (
+        <Image
+          src={content.imageSrc}
+          alt={content.imageAlt}
+          width={content.imageWidth}
+          height={content.imageHeight}
+          mb={4}
+        />
+      );
+    case "list":
+      const ListComponent =
+        content.listType === "ordered" ? OrderedList : UnorderedList;
+      return (
+        <ListComponent mb={4}>
+          {(content.content as string[]).map((item, index) => (
+            <ListItem key={index}>{item}</ListItem>
+          ))}
+        </ListComponent>
+      );
+    default:
+      return null;
+  }
+};
 
 export const ManualSection: React.FC<ManualSectionProps> = ({
   section,
@@ -36,24 +69,10 @@ export const ManualSection: React.FC<ManualSectionProps> = ({
 
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-  const headingColor =
-    level <= 2
-      ? theme.colors.blue[700]
-      : useColorModeValue(
-          `blue.${600 + level * 100}`,
-          `blue.${300 + level * 100}`
-        );
-
-  const contentWithStyledLists = section.content
-    .replace(
-      /<ul>/g,
-      '<ul style="list-style-type: disc; padding-left: 1.5em; margin-bottom: 1em;">'
-    )
-    .replace(
-      /<ol>/g,
-      '<ol style="list-style-type: decimal; padding-left: 1.5em; margin-bottom: 1em;">'
-    )
-    .replace(/<li>/g, '<li style="margin-bottom: 0.5em;">');
+  const headingColor = useColorModeValue(
+    `blue.${700 - level * 100}`,
+    `blue.${300 + level * 100}`
+  );
 
   return (
     <Box
@@ -73,27 +92,11 @@ export const ManualSection: React.FC<ManualSectionProps> = ({
       >
         {section.title}
       </Heading>
-      <Box
-        mb={6}
-        fontSize="md"
-        lineHeight="tall"
-        dangerouslySetInnerHTML={{ __html: contentWithStyledLists }}
-        sx={{
-          "ul, ol": {
-            paddingLeft: "1.5em",
-            marginBottom: "1em",
-          },
-          ul: {
-            listStyleType: "disc",
-          },
-          ol: {
-            listStyleType: "decimal",
-          },
-          li: {
-            marginBottom: "0.5em",
-          },
-        }}
-      />
+      {section.content.map((contentItem, index) => (
+        <React.Fragment key={index}>
+          {renderContent(contentItem)}
+        </React.Fragment>
+      ))}
       {section.subsections && section.subsections.length > 0 && (
         <Accordion allowMultiple>
           {section.subsections.map((subsection, index) => (
